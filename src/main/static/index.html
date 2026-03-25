@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Netflix – Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --netflix-red: #e50914;
+      --netflix-red-hover: #f6121d;
+      --bg-dark: #141414;
+      --card-bg: rgba(0,0,0,0.75);
+      --input-bg: #333;
+      --input-bg-focus: #454545;
+      --text-primary: #fff;
+      --text-secondary: #b3b3b3;
+      --error-color: #e87c03;
+      --border-radius: 4px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+    }
+
+    /* ── Background image + gradient overlay ── */
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      /* Netflix's signature dark red-brown — shown when image doesn't load */
+      background: radial-gradient(ellipse at 50% 40%, #3b0b0b 0%, #1c0404 45%, #0a0000 100%);
+      background-image:
+        radial-gradient(ellipse at 50% 40%, rgba(65,8,8,0.78) 0%, rgba(8,0,0,0.90) 65%),
+        url('https://assets.nflxext.com/ffe/siteui/vlv3/9db4ca8a-674e-4f6c-8fac-b3b572069f0c/IN/IN-en-20240205-popsignuptwoweeks-perspective_alpha_website_large.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      /* Top & bottom vignette — matches Netflix login exactly */
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.5) 0%,
+        rgba(0,0,0,0.15) 40%,
+        rgba(0,0,0,0.5) 100%
+      );
+    }
+
+    /* ── Top nav ── */
+    .nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      padding: 24px 56px;
+    }
+    .nav-logo {
+      color: var(--netflix-red);
+      font-size: 2.6rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      font-style: normal;
+      font-family: 'Bebas Neue', 'Arial Black', sans-serif;
+    }
+
+    /* ── Main layout ── */
+    main {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px 0 80px;
+      min-height: calc(100vh - 100px);
+    }
+
+    /* ── Login Card ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: 4px;
+      padding: 60px 68px 40px;
+      width: 100%;
+      max-width: 450px;
+      animation: fadeInUp 0.45s ease both;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 28px;
+      letter-spacing: -0.3px;
+    }
+
+    /* ── Floating-label input group ── */
+    .field {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .field input {
+      width: 100%;
+      height: 56px;
+      background: var(--input-bg);
+      border: none;
+      border-radius: var(--border-radius);
+      color: var(--text-primary);
+      font-size: 1rem;
+      padding: 16px 16px 0;
+      outline: none;
+      transition: background 0.15s;
+      caret-color: #fff;
+    }
+    .field input:focus {
+      background: var(--input-bg-focus);
+    }
+    .field label {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8c8c8c;
+      font-size: 1rem;
+      pointer-events: none;
+      transition: top 0.15s ease, font-size 0.15s ease, transform 0.15s ease;
+    }
+    .field input:focus ~ label,
+    .field input:not(:placeholder-shown) ~ label {
+      top: 10px;
+      transform: translateY(0);
+      font-size: 0.72rem;
+      color: #8c8c8c;
+    }
+
+    /* ── Error message ── */
+    .error-msg {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      color: var(--error-color);
+      font-size: 0.82rem;
+      margin-top: -10px;
+      margin-bottom: 12px;
+      padding: 0 2px;
+    }
+    .error-msg.visible { display: flex; }
+    .error-msg svg { flex-shrink: 0; }
+
+    /* ── Continue button ── */
+    .btn-continue {
+      width: 100%;
+      height: 50px;
+      background: var(--netflix-red);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 12px;
+    }
+    .btn-continue:hover { background: var(--netflix-red-hover); }
+    .btn-continue:active { transform: scale(0.985); }
+
+    /* ── OR divider ── */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 12px 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .or-divider::before, .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #404040;
+    }
+
+    /* ── Sign-in with code ── */
+    .btn-code {
+      width: 100%;
+      height: 50px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-bottom: 16px;
+    }
+    .btn-code:hover { background: #3d3d3d; }
+
+    /* ── Forgot / Help ── */
+    .help-section {
+      margin-top: 20px;
+    }
+    .help-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-primary);
+      user-select: none;
+      width: fit-content;
+      margin-bottom: 12px;
+    }
+    .help-toggle svg {
+      transition: transform 0.2s;
+    }
+    .help-toggle.open svg { transform: rotate(180deg); }
+
+    .help-links {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .help-links.open { display: flex; }
+    .help-links a {
+      color: var(--text-primary);
+      text-decoration: underline;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .help-links a:hover { text-decoration: none; }
+
+    /* ── Bottom sign-up ── */
+    .signup-row {
+      margin-top: 28px;
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+    .signup-row a {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .signup-row a:hover { text-decoration: underline; }
+
+    /* ── reCAPTCHA notice ── */
+    .recaptcha-note {
+      margin-top: 16px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+    .recaptcha-note a {
+      color: var(--text-secondary);
+      text-decoration: underline;
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 10;
+      background: rgba(0,0,0,0.75);
+      padding: 28px 56px;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+    }
+    .footer-phone {
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 30px;
+      margin-bottom: 20px;
+    }
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .footer-links a:hover { text-decoration: underline; }
+    .footer-country {
+      margin-top: 12px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .nav { padding: 18px 24px; }
+      .card { padding: 40px 24px 28px; }
+      footer { padding: 20px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero-bg"></div>
+
+  <!-- Top Nav -->
+  <nav class="nav">
+    <a class="nav-logo" href="#">Netflix</a>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <div class="card">
+      <h1>Sign In</h1>
+
+      <!-- Email field -->
+      <div class="field">
+        <input type="text" id="email" placeholder=" " autocomplete="username" oninput="clearError()" onkeydown="handleKey(event)" />
+        <label for="email">Email or mobile number</label>
+      </div>
+
+      <!-- Error -->
+      <div class="error-msg" id="emailError">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7.5" stroke="#e87c03"/>
+          <path d="M8 4.5v4" stroke="#e87c03" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8" cy="11" r="0.75" fill="#e87c03"/>
+        </svg>
+        Please enter a valid email or mobile number.
+      </div>
+
+      <!-- Password field (hidden until email entered) -->
+      <div class="field" id="passwordField" style="display:none;">
+        <input type="password" id="password" placeholder=" " autocomplete="current-password" />
+        <label for="password">Password</label>
+      </div>
+
+      <!-- Continue / Sign In button -->
+      <button class="btn-continue" id="mainBtn" onclick="handleContinue()">Continue</button>
+
+      <!-- OR divider -->
+      <div class="or-divider">OR</div>
+
+      <!-- Sign in with code -->
+      <button class="btn-code">Use a sign-in code</button>
+
+      <!-- Forgot password -->
+      <a href="#" style="color:#b3b3b3;font-size:0.9rem;display:block;margin-bottom:16px;text-align:right;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Forgot password?</a>
+
+      <!-- Get Help section -->
+      <div class="help-section">
+        <div class="help-toggle" id="helpToggle" onclick="toggleHelp()">
+          Get Help
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 4.5l5 5 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="help-links" id="helpLinks">
+          <a href="#">Forgot email or mobile number?</a>
+          <a href="#">Learn more about sign-in</a>
+        </div>
+      </div>
+
+      <!-- Sign up -->
+      <div class="signup-row">
+        New to Netflix? <a href="#">Sign up now</a>.
+      </div>
+
+      <!-- reCAPTCHA -->
+      <p class="recaptcha-note">
+        This page is protected by Google reCAPTCHA to ensure you're not a bot.
+        <a href="#">Learn more</a>.
+      </p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p class="footer-phone">Questions? Call <a href="tel:000-800-919-1743" style="color:#b3b3b3;text-decoration:underline">000-800-919-1743</a></p>
+    <div class="footer-links">
+      <a href="#">FAQ</a>
+      <a href="#">Help Centre</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Privacy</a>
+      <a href="#">Cookie Preferences</a>
+      <a href="#">Corporate Information</a>
+    </div>
+    <div class="footer-country">Netflix India</div>
+  </footer>
+
+  <script>
+    let emailEntered = false;
+
+    function clearError() {
+      document.getElementById('emailError').classList.remove('visible');
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter') handleContinue();
+    }
+
+    function handleContinue() {
+      const email = document.getElementById('email').value.trim();
+      const passwordField = document.getElementById('passwordField');
+      const mainBtn = document.getElementById('mainBtn');
+      const errorEl = document.getElementById('emailError');
+
+      if (!emailEntered) {
+        // Validate email / phone
+        const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+                   || /^\+?[\d\s\-]{7,15}$/.test(email);
+        if (!email || !valid) {
+          errorEl.classList.add('visible');
+          document.getElementById('email').focus();
+          return;
+        }
+        // Show password field
+        passwordField.style.display = 'block';
+        passwordField.style.animation = 'fadeInUp 0.3s ease both';
+        mainBtn.textContent = 'Sign In';
+        emailEntered = true;
+        document.getElementById('password').focus();
+      } else {
+        // Sign-in action
+        alert('Sign-in flow would continue here.');
+      }
+    }
+
+    function toggleHelp() {
+      const toggle = document.getElementById('helpToggle');
+      const links  = document.getElementById('helpLinks');
+      toggle.classList.toggle('open');
+      links.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>
