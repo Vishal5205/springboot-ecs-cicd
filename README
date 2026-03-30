@@ -1,33 +1,27 @@
-# 🚀 Spring Boot CI/CD Deployment on ECS
+#  Spring Boot CI/CD Deployment on ECS
 
 This project demonstrates deploying a Spring Boot application using Docker and AWS ECS.
 
 ---
 
-## Step 1: Launch EC2
+##  Application Running
 
-![EC2](Screenshots/ec2.png)
-
----
-
-## Step 2: Application Running (Docker)
-
-![App](Screenshots/Live%20WEB%20.png)
+![App](Screenshots/live.png)
 
 ---
 
-## Step 3: ECS Service Running
+##  ECS Service Running
 
-![ECS](Screenshots/Service%20=%20Active.png)
-
----
-
-## Step 4: Load Balancer
-
-![ALB](Screenshots/Load%20balancer.png)
+![ECS](Screenshots/ecs.png)
 
 ---
 
-## Step 5: Target Group Health
+##  Load Balancer
 
-![Target](Screenshots/Traget%20group.png)
+![ALB](Screenshots/load-balancer.png)
+
+---
+
+##  Target Group Health
+
+![Target](Screenshots/target.png)
